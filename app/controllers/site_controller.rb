@@ -1,7 +1,7 @@
 class SiteController < ApplicationController
 
   def index
-    render :json => "Hi!", :status => 200
+    render 'index'
   end
 
   def project_description

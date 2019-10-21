@@ -4,4 +4,6 @@ Rails.application.routes.draw do
   controller :site_input do
     post '/project_description', action: :project_description
   end
+
+  root to: 'site#index'
 end

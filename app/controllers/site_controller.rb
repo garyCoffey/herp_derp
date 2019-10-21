@@ -1,7 +1,6 @@
 class SiteController < ApplicationController
-
   def index
-    render 'index'
+    render :template => "index.html"
   end
 
   def project_description
@@ -15,6 +14,6 @@ class SiteController < ApplicationController
 
   def architecture
     famous_words = AppConfig.architecturey.famous_words
-    famous_words.shuffle.last 3
+    render :json => "#{famous_words.shuffle.last 3}"
   end
 end

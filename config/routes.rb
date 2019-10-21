@@ -3,8 +3,8 @@ Rails.application.routes.draw do
 
   controller :site do
     post '/project_description', action: :project_description
-    get 'architecture', action: :architecture
+    get '/architecture', action: :architecture
   end
 
-  root to: 'site#index'
+  root :to=> "site#index"
 end

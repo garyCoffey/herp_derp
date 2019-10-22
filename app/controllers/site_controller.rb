@@ -1,6 +1,6 @@
 class SiteController < ApplicationController
   def index
-    render :template => "index.html"
+    render :template => "pages/index.html"
   end
 
   def project_description

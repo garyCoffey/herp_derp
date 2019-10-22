@@ -1,19 +1,16 @@
 class SiteController < ApplicationController
   def index
-    render :template => "pages/index.html"
-  end
-
-  def project_description
-    project = params[:user_input]
-    if project.blank?
-      render :json => "Please describe your project in plain english, using words.", :status => 200
-      return
-    end
-    ##String processing - what are we processing though?
+    render template: 'pages/index.html'
   end
 
   def architecture
-    famous_words = AppConfig.architecturey.famous_words
-    render :json => "#{famous_words.shuffle.last 3}"
+    if params[:question].blank?
+      render json: {
+        error: 'Please describe your project in plain english.'
+      }, status: :bad_request
+    else
+      famous_words = AppConfig.architecturey.famous_words
+      render json: { words: famous_words.sample(3) }
+    end
   end
 end

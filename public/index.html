@@ -1,3 +1,187 @@
-<h2>Index</h2>
-
-<p>Sup pumpkins</p>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Building the next generation Enterprise Solutions Cloud Architect</title>
+        <link rel="stylesheet" href="assets/css/normalize.min.css">
+        <link rel='stylesheet' href='assets/css/bulma.min.css'>
+    </head>
+    <body translate="no">
+        <div id="app">
+            <header class="hero is-primary">
+                <div class="hero-body">
+                    <div class="content">
+                        <h1 class="title">
+                            Web Application Architecture Bot
+                        </h1>
+                        <p class="subtitle">
+                            Featuring Vue.js, AWS Lambda, and Rasberry Pi
+                        </p>
+                    </div>
+                </div>
+            </header>
+            <section v-if="step == 1" class="section">
+                <div class="content">
+                    <div class="field">
+                        <label class="label" for="question">What Problem Would You Like to Solve?</label>
+                        <div class="control">
+                            <textarea v-model="question" id="question" class="textarea" placeholder="I would like to solve world hunger."></textarea>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button
+                              @click="submit"
+                              :disabled="formInvalid"
+                              class="button is-primary"
+                            >Submit</button@click="submit">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section v-if="step === 2" class="section">
+                <div class="content">
+                    <h2>Result</h2>
+                    <p>{{ result }}</p>
+                    <div class="field">
+                        <label class="label" for="voice">Voice</label>
+                        <div class="control">
+                            <div class="select">
+                                <select v-model="selectedVoiceName" id="voice">
+                                    <option v-for="voice in voices" :key="voice.name" :value="voice.name">{{ voice.name }} ({{ voice.lang }})</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="pitch">Pitch</label>
+                        <div class="control">
+                            <input v-model="pitch" id="pitch" type="range" min="0" max="2" step=".1">
+                            <span>{{ pitch }}</span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="rate">Rate</label>
+                        <div class="control">
+                            <input v-model="rate" id="rate" type="range" min="0" max="2" step=".1">
+                            <span>{{ rate }}</span>
+                        </div>
+                    </div>
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button @click="play" class="button is-success">Play</button>
+                        </div>
+                        <div class="control">
+                            <button @click="pause" class="button is-warning">Pause</button>
+                        </div>
+                        <div class="control">
+                            <button @click="resume" class="button is-link">Resume</button>
+                        </div>
+                        <div class="control">
+                            <button @click="cancel" class="button is-danger">Stop</button>
+                        </div>
+                        <div class="control">
+                            <button @click="reset" class="button is-primary">Ask Another Question</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="modal" :class="{ 'is-active': loading }">
+                <div class="modal-background"></div>
+                <div class="modal-content">
+                    <div class="container">
+                        <progress class="progress is-small is-primary" max="100">15%</progress>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src='assets/js/axios.min.js'></script>
+        <script src='assets/js/vue.min.js'></script>
+        <script>
+        const app = new Vue({
+            el: "#app",
+            data: {
+              step: 1,
+              loading: false,
+              synth: null,
+              voices: null,
+              selectedVoiceName: 'Alex',
+              pitch: 1,
+              rate: 1,
+              question: '',
+              result: ''
+            },
+            mounted() {
+              this.synth = window.speechSynthesis;
+              this.getVoices().
+                then(voices => {
+                return this.voices = voices;
+                });
+            },
+            computed: {
+              selectedVoice() {
+                return this.voices.find(voice => voice.name === this.selectedVoiceName);
+              },
+              formInvalid() {
+                return this.question === '';
+              },
+            },
+            methods: {
+              getVoices() {
+                return new Promise((resolve, reject) => {
+                  let id;
+                  id = setInterval(() => {
+                    if (this.synth.getVoices().length !== 0) {
+                      resolve(this.synth.getVoices());
+                      clearInterval(id);
+                    }
+                  }, 10);
+                });
+              },
+              submit(response) {
+                this.loading = true;
+                axios.post('/architecture', {
+                  question: this.question
+                }).
+                  then(response => {
+                    this.step = 2;
+                    this.result = `You should use ${response.data.words.join(', ')}`;
+                    this.loading = false;
+                  }).
+                  catch(e => {
+                    this.loading = false;
+                    alert(e.response.data.error);
+                  });
+              },
+              play() {
+                this.cancel();
+                let utterance = new SpeechSynthesisUtterance(this.result);
+                utterance.voice = this.selectedVoice;
+                utterance.pitch = this.pitch;
+                utterance.rate = this.rate;
+                this.synth.speak(utterance);
+              },
+              pause() {
+                this.synth.pause();
+              },
+              resume() {
+                this.synth.resume();
+              },
+              cancel() {
+                this.synth.cancel();
+              },
+              reset() {
+                this.loading = true;
+                this.cancel();
+                setTimeout(() => {
+                  this.question = '';
+                  this.result = '';
+                  this.loading = false;
+                  this.step = 1;
+                }, 1000);
+              }
+            }
+          });
+        </script>
+    </body>
+</html>

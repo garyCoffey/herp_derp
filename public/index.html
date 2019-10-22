@@ -5,6 +5,57 @@
         <title>Building the next generation Enterprise Solutions Cloud Architect</title>
         <link rel="stylesheet" href="assets/css/normalize.min.css">
         <link rel='stylesheet' href='assets/css/bulma.min.css'>
+        <style>
+          .face {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            height: 280px;
+            margin-bottom: 15px;
+          }
+
+          .top {
+            transform-origin: bottom left;
+          }
+
+          .bottom {
+            transform-origin: top left;
+          }
+
+          .animating {
+            animation-duration: .25s;
+            animation-iteration-count: infinite;
+            animation-fill-mode: forwards;
+          }
+
+          .top.animating {
+            animation-name: talk-top;
+          }
+
+          .bottom.animating {
+            animation-name: talk-bottom;
+          }
+
+          @keyframes talk-top {
+            from {
+              transform: rotate(0);
+            }
+
+            to {
+              transform: rotate(-2deg);
+            }
+          }
+
+          @keyframes talk-bottom {
+            from {
+              transform: rotate(0);
+            }
+
+            to {
+              transform: rotate(2deg);
+            }
+          }
+        </style>
     </head>
     <body translate="no">
         <div id="app">
@@ -42,44 +93,22 @@
             <section v-if="step === 2" class="section">
                 <div class="content">
                     <h2>Result</h2>
+                    <div class="face">
+                      <img
+                        class="top"
+                        src="assets/img/top.jpg"
+                        alt=""
+                        :class="{ 'animating': animating }"
+                      >
+                      <img
+                        class="bottom"
+                        src="assets/img/bottom.jpg"
+                        alt=""
+                        :class="{ 'animating': animating }"
+                      >
+                    </div>
                     <p>{{ result }}</p>
                     <div class="field">
-                        <label class="label" for="voice">Voice</label>
-                        <div class="control">
-                            <div class="select">
-                                <select v-model="selectedVoiceName" id="voice">
-                                    <option v-for="voice in voices" :key="voice.name" :value="voice.name">{{ voice.name }} ({{ voice.lang }})</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label" for="pitch">Pitch</label>
-                        <div class="control">
-                            <input v-model="pitch" id="pitch" type="range" min="0" max="2" step=".1">
-                            <span>{{ pitch }}</span>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label" for="rate">Rate</label>
-                        <div class="control">
-                            <input v-model="rate" id="rate" type="range" min="0" max="2" step=".1">
-                            <span>{{ rate }}</span>
-                        </div>
-                    </div>
-                    <div class="field is-grouped">
-                        <div class="control">
-                            <button @click="play" class="button is-success">Play</button>
-                        </div>
-                        <div class="control">
-                            <button @click="pause" class="button is-warning">Pause</button>
-                        </div>
-                        <div class="control">
-                            <button @click="resume" class="button is-link">Resume</button>
-                        </div>
-                        <div class="control">
-                            <button @click="cancel" class="button is-danger">Stop</button>
-                        </div>
                         <div class="control">
                             <button @click="reset" class="button is-primary">Ask Another Question</button>
                         </div>
@@ -109,7 +138,8 @@
               pitch: 1,
               rate: 1,
               question: '',
-              result: ''
+              result: '',
+              animating: false
             },
             mounted() {
               this.synth = window.speechSynthesis;
@@ -125,6 +155,9 @@
               formInvalid() {
                 return this.question === '';
               },
+              isSpeaking() {
+
+              }
             },
             methods: {
               getVoices() {
@@ -146,12 +179,23 @@
                   then(response => {
                     this.step = 2;
                     this.result = `You should use ${response.data.words.join(', ')}`;
+                    this.play();
                     this.loading = false;
                   }).
                   catch(e => {
                     this.loading = false;
                     alert(e.response.data.error);
                   });
+              },
+              animate() {
+                this.animating = true;
+                let id;
+                id = setInterval(() => {
+                  if (this.synth.speaking === false) {
+                    this.animating = false;
+                    clearInterval(id);
+                  }
+                }, 10);
               },
               play() {
                 this.cancel();
@@ -160,6 +204,7 @@
                 utterance.pitch = this.pitch;
                 utterance.rate = this.rate;
                 this.synth.speak(utterance);
+                this.animate();
               },
               pause() {
                 this.synth.pause();

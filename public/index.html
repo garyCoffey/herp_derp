@@ -178,7 +178,7 @@
                 }).
                   then(response => {
                     this.step = 2;
-                    this.result = `You should use ${response.data.words.join(', ')}`;
+                    this.result = `You should use ${response.data.words.join(', ').replace(/, ([^,]*)$/, ', and $1')}`;
                     this.play();
                     this.loading = false;
                   }).

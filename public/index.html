@@ -97,7 +97,9 @@
         <script src="assets/js/axios.min.js"></script>
         <script src="assets/js/vue.min.js"></script>
         <script>
-          const app = new Vue({
+          "use strict";
+
+          var app = new Vue({
             el: "#app",
             data: {
               step: 1,
@@ -121,74 +123,84 @@
                 }
               }
             },
-            mounted() {
+            mounted: function mounted() {
+              var _this = this;
+
               this.synth = window.speechSynthesis;
-              this.getVoices().
-                then(voices => {
-                  this.voices = voices;
-                });
+              this.getVoices().then(function (voices) {
+                _this.voices = voices;
+              });
             },
             computed: {
-              selectedVoice() {
-                return this.voices.find(voice => voice.name === this.selectedVoiceName);
+              selectedVoice: function selectedVoice() {
+                var _this2 = this;
+
+                return this.voices.find(function (voice) {
+                  return voice.name === _this2.selectedVoiceName;
+                });
               },
-              formInvalid() {
+              formInvalid: function formInvalid() {
                 return this.question === '';
               }
             },
             methods: {
-              getVoices() {
-                return new Promise((resolve) => {
-                  this.synth.getVoices();
-                  window.speechSynthesis.onvoiceschanged = () => {
-                    resolve(this.synth.getVoices());
+              getVoices: function getVoices() {
+                var _this3 = this;
+
+                return new Promise(function (resolve) {
+                  _this3.synth.getVoices();
+
+                  window.speechSynthesis.onvoiceschanged = function () {
+                    resolve(_this3.synth.getVoices());
                   };
                 });
               },
-              submit(response) {
+              submit: function submit(response) {
+                var _this4 = this;
+
                 this.loading = true;
                 axios.post('/architecture', {
                   question: this.question
-                }).
-                  then(response => {
-                    this.loading = false;
-                    this.step = 2;
-                    this.result = response.data.message;
-                    this.speak()
-                      .then(() => {
-                        this.animating = false;
-                      });
-                  }).
-                  catch(e => {
-                    this.loading = false;
-                    alert(e.response.data.error || 'Oops! Something went wrong.');
+                }).then(function (response) {
+                  _this4.loading = false;
+                  _this4.step = 2;
+                  _this4.result = response.data.message;
+
+                  _this4.speak().then(function () {
+                    _this4.animating = false;
                   });
+                }).catch(function (e) {
+                  _this4.loading = false;
+                  alert(e.response.data.error || 'Oops! Something went wrong.');
+                });
               },
-              play() {
-                let utterance = new SpeechSynthesisUtterance(this.result);
+              play: function play() {
+                var utterance = new SpeechSynthesisUtterance(this.result);
                 utterance.voice = this.selectedVoice;
                 utterance.pitch = this.pitch;
                 utterance.rate = this.rate;
                 this.synth.speak(utterance);
               },
-              speak() {
+              speak: function speak() {
+                var _this5 = this;
+
                 this.cancel();
                 this.animating = true;
                 this.play();
-                return new Promise((resolve) => {
-                  let id;
-                  id = setInterval(() => {
-                    if (this.synth.speaking === false) {
+                return new Promise(function (resolve) {
+                  var id;
+                  id = setInterval(function () {
+                    if (_this5.synth.speaking === false) {
                       resolve();
                       clearInterval(id);
                     }
                   }, 100);
                 });
               },
-              cancel() {
+              cancel: function cancel() {
                 this.synth.cancel();
               },
-              reset() {
+              reset: function reset() {
                 this.cancel();
                 this.question = '';
                 this.result = '';

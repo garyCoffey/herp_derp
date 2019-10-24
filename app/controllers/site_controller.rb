@@ -9,8 +9,14 @@ class SiteController < ApplicationController
         error: 'Please describe your project in plain english.'
       }, status: :bad_request
     else
-      famous_words = AppConfig.architecturey.famous_words
-      render json: { words: famous_words.sample(3) }
+      render json: { message: message, principal: 'greg' }
     end
+  end
+
+  private
+
+  def message
+    words = AppConfig.architecturey.famous_words.sample(3)
+    "You should build an application using #{words.to_sentence}."
   end
 end

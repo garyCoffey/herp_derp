@@ -1,0 +1,49 @@
+.face {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 280px;
+  margin-bottom: 15px;
+}
+
+.top {
+  transform-origin: bottom left;
+}
+
+.bottom {
+  transform-origin: top left;
+}
+
+.animating {
+  animation-duration: .25s;
+  animation-iteration-count: infinite;
+  animation-fill-mode: forwards;
+}
+
+.top.animating {
+  animation-name: talk-top;
+}
+
+.bottom.animating {
+  animation-name: talk-bottom;
+}
+
+@keyframes talk-top {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes talk-bottom {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(2deg);
+  }
+}

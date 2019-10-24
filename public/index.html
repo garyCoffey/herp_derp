@@ -138,14 +138,11 @@
             },
             methods: {
               getVoices() {
-                return new Promise((resolve, reject) => {
-                  let id;
-                  id = setInterval(() => {
-                    if (this.synth.getVoices().length !== 0) {
-                      resolve(this.synth.getVoices());
-                      clearInterval(id);
-                    }
-                  }, 10);
+                return new Promise((resolve) => {
+                  this.synth.getVoices();
+                  window.speechSynthesis.onvoiceschanged = () => {
+                    resolve(this.synth.getVoices());
+                  };
                 });
               },
               submit(response) {
@@ -164,7 +161,7 @@
                   }).
                   catch(e => {
                     this.loading = false;
-                    alert(e.response.data.error);
+                    alert(e.response.data.error || 'Oops! Something went wrong.');
                   });
               },
               play() {
@@ -175,32 +172,28 @@
                 this.synth.speak(utterance);
               },
               speak() {
-                this.animating = true;
                 this.cancel();
+                this.animating = true;
                 this.play();
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve) => {
                   let id;
                   id = setInterval(() => {
                     if (this.synth.speaking === false) {
                       resolve();
                       clearInterval(id);
                     }
-                  }, 10);
+                  }, 100);
                 });
               },
               cancel() {
                 this.synth.cancel();
               },
               reset() {
-                this.loading = true;
                 this.cancel();
-                setTimeout(() => {
-                  this.question = '';
-                  this.result = '';
-                  this.loading = false;
-                  this.animating = false;
-                  this.step = 1;
-                }, 500);
+                this.question = '';
+                this.result = '';
+                this.animating = false;
+                this.step = 1;
               }
             }
           });

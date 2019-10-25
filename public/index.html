@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="assets/css/main.css">
     </head>
     <body translate="no">
-        <div id="app">
+        <div id="app" v-cloak>
             <header class="hero is-primary">
                 <div class="hero-body">
                     <div class="content">
@@ -53,22 +53,15 @@
               class="section"
             >
                 <div class="content">
-                    <h2>Result</h2>
-                    <div class="face">
+                    <h2>{{ principalName }} Says</h2>
+                    <div class="principal">
                       <img
-                        :class="{ 'animating': animating }"
-                        class="top"
-                        src="assets/img/top.jpg"
+                        class="principal__img"
+                        :src="`assets/img/${principal}.jpg`"
                         alt=""
                       >
-                      <img
-                        :class="{ 'animating': animating }"
-                        class="bottom"
-                        src="assets/img/bottom.jpg"
-                        alt=""
-                      >
+                      <div class="speech-bubble">{{ bubbleText }}</div>
                     </div>
-                    <p>{{ result }}</p>
                     <div class="field">
                         <div class="control">
                             <button
@@ -83,128 +76,88 @@
               :class="{ 'is-active': loading }"
               class="modal"
             >
-                <div class="modal-background"></div>
-                <div class="modal-content">
-                    <div class="container">
+              <div class="modal-background"></div>
+                <div class="modal-card">
+                  <section class="modal-card-body">
+                    <div class="content">
+                        <h3>Thinking...</h3>
                         <progress
                           class="progress is-small is-primary"
                           max="100"
                         >15%</progress>
                     </div>
+                  </section>
                 </div>
             </div>
         </div>
         <script src="assets/js/axios.min.js"></script>
         <script src="assets/js/vue.min.js"></script>
         <script>
-          "use strict";
-
-          var app = new Vue({
+          const app = new Vue({
             el: "#app",
             data: {
               step: 1,
               loading: false,
-              synth: null,
-              voices: null,
-              selectedVoiceName: 'Alex',
-              pitch: 1,
-              rate: 1,
               question: '',
               result: '',
-              animating: false,
-              principals: {
-                greg: {
-                  voice: {
-                    name: 'Alex',
-                    pitch: 1,
-                    rate: 1
-                  },
-                  img: 'assets/img/greg'
-                }
-              }
-            },
-            mounted: function mounted() {
-              var _this = this;
-
-              this.synth = window.speechSynthesis;
-              this.getVoices().then(function (voices) {
-                _this.voices = voices;
-              });
+              bubbleText: '',
+              principals: [
+                'costi',
+                'greg',
+                'matt',
+                'rob',
+                'sam',
+                'vishak',
+                'vishal'
+              ],
+              principal: 'greg'
             },
             computed: {
-              selectedVoice: function selectedVoice() {
-                var _this2 = this;
-
-                return this.voices.find(function (voice) {
-                  return voice.name === _this2.selectedVoiceName;
-                });
-              },
-              formInvalid: function formInvalid() {
+              formInvalid() {
                 return this.question === '';
+              },
+              principalName() {
+                return this.principal.charAt(0).toUpperCase() + this.principal.slice(1);
               }
             },
             methods: {
-              getVoices: function getVoices() {
-                var _this3 = this;
-
-                return new Promise(function (resolve) {
-                  _this3.synth.getVoices();
-
-                  window.speechSynthesis.onvoiceschanged = function () {
-                    resolve(_this3.synth.getVoices());
-                  };
-                });
+              randomPrincipal() {
+                return this.principals[Math.floor(Math.random() * this.principals.length)];
               },
-              submit: function submit(response) {
-                var _this4 = this;
-
+              submit(response) {
                 this.loading = true;
                 axios.post('/architecture', {
                   question: this.question
-                }).then(function (response) {
-                  _this4.loading = false;
-                  _this4.step = 2;
-                  _this4.result = response.data.message;
-
-                  _this4.speak().then(function () {
-                    _this4.animating = false;
+                }).
+                  then(response => {
+                    setTimeout(() => {
+                      this.loading = false;
+                      this.step = 2;
+                      this.principal = this.randomPrincipal();
+                      this.result = response.data.message;
+                      this.speak();
+                    }, 7500);
+                  }).
+                  catch(e => {
+                    this.loading = false;
+                    alert(e.response.data.error || 'Oops! Something went wrong.');
                   });
-                }).catch(function (e) {
-                  _this4.loading = false;
-                  alert(e.response.data.error || 'Oops! Something went wrong.');
-                });
               },
-              play: function play() {
-                var utterance = new SpeechSynthesisUtterance(this.result);
-                utterance.voice = this.selectedVoice;
-                utterance.pitch = this.pitch;
-                utterance.rate = this.rate;
-                this.synth.speak(utterance);
+              speak() {
+                let i = 0;
+                let words = this.result.split(' ');
+                let timer = setInterval(() => {
+                  this.bubbleText += `${words[i]} `;
+                  i ++;
+                  if (i == words.length) {
+                    clearInterval(timer);
+                  }
+                }, 125);
               },
-              speak: function speak() {
-                var _this5 = this;
-
-                this.cancel();
-                this.animating = true;
-                this.play();
-                return new Promise(function (resolve) {
-                  var id;
-                  id = setInterval(function () {
-                    if (_this5.synth.speaking === false) {
-                      resolve();
-                      clearInterval(id);
-                    }
-                  }, 100);
-                });
-              },
-              cancel: function cancel() {
-                this.synth.cancel();
-              },
-              reset: function reset() {
-                this.cancel();
+              reset() {
                 this.question = '';
                 this.result = '';
-                this.animating = false;
+                this.bubbleText = '';
                 this.step = 1;
               }
             }

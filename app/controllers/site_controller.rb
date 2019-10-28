@@ -10,7 +10,7 @@ class SiteController < ApplicationController
       }, status: :bad_request
     else
       system('python lights.py')
-      render json: { words: famous_words.sample(3) }
+      render json: { message: message, principal: 'greg' }
     end
   end
 

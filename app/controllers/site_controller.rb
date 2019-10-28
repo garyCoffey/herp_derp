@@ -9,7 +9,9 @@ class SiteController < ApplicationController
         error: 'Please describe your project in plain english.'
       }, status: :bad_request
     else
-      render json: { message: message, principal: 'greg' }
+      famous_words = AppConfig.architecturey.famous_words
+      system('python lights.py')
+      render json: { words: famous_words.sample(3) }
     end
   end
 

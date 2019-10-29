@@ -122,15 +122,16 @@ if __name__ == "__main__":
     for i in range(PIXEL_COUNT):
         pixels.set_pixel_rgb(i, *color_from_sentiment(sentiment))
         pixels.show()
-        time.sleep(0.05)
+        time.sleep(0.08)
 
+    time.sleep(2)
     pixels.clear()
     pixels.show()
 
     for j in reversed(range(PIXEL_COUNT)):
         pixels.set_pixel_rgb(j, *color_from_sentiment(sentiment))
         pixels.show()
-        time.sleep(0.05)
+        time.sleep(0.08)
 
 
     time.sleep(5)

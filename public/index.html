@@ -13,10 +13,13 @@
                 <div class="hero-body">
                     <div class="content">
                         <h1 class="title">
-                            Solutioning App Architecture
+                            PUMPKIN OFFICE HOURS
                         </h1>
+                        <h3>
+                            Featuring Enterprise Solutions Cloud Architect pumpkin, with our actual Enterprise Architect Greg Lacy and principals.
+                        </h3>
                         <p class="subtitle">
-                            Featuring Vue.js, Ruby on Rails, Python, AWS Comprehend and Rasberry Pi
+                            Powered by Vue.js, Ruby on Rails, Python, AWS Comprehend and Rasberry Pi
                         </p>
                     </div>
                 </div>
@@ -27,7 +30,7 @@
             >
                 <div class="content">
                     <div class="field">
-                        <label class="label" for="question">Enter the problem you want to solve (technical or non-techncial) and get an answer from Enova's greatest technical minds! Featuring Enterprise Solutions Cloud Architect pumpkin, with our actual Enterprise Architect Greg Lacey and principals.</label>
+                        <label class="label" for="question">Enter the problem you want to solve (technical or non-techncial):</label>
                         <div class="control">
                             <textarea
                               ref="inputControl"
@@ -55,7 +58,9 @@
             >
                 <div class="content">
                   <h2>You said</h2>
-                  <i>"{{ question }}"</i>
+                  <div class="user-question">
+                    "{{ question }}"
+                  </div>
                   <div class="sentiment-analysis">
                     (which has a {{ sentiment }} sentiment)
                   </div>
@@ -73,6 +78,8 @@
                             <button
                               @click="reset"
                               class="button is-primary"
+                              autofocus="true"
+                              type="submit"
                             >Ask Another Question</button>
                         </div>
                     </div>
@@ -96,6 +103,13 @@
                   </section>
                 </div>
             </div>
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>
+                        &copy; Copyright 2019, Team Brexit <img src="assets/img/united-kingdom-flag-icon-32.png" title="Be calm, we're not leaving you a loan" alt="Be calm, we're not leaving you a loan"/>.  All rights in special-reserve.
+                    </p>
+                </div>
+            </footer>
         </div>
         <script src="assets/js/axios.min.js"></script>
         <script src="assets/js/vue.min.js"></script>

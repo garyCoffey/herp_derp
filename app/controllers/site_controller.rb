@@ -9,6 +9,7 @@ class SiteController < ApplicationController
         error: 'Please describe your project in plain english.'
       }, status: :bad_request
     else
+      system('python lights.py')
       render json: { message: message, principal: 'greg' }
     end
   end

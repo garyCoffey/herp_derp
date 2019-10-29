@@ -34,3 +34,4 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'figgy'
+gem 'aws-sdk-comprehend', '~> 1'

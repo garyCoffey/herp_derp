@@ -13,10 +13,10 @@
                 <div class="hero-body">
                     <div class="content">
                         <h1 class="title">
-                            Web Application Architecture Bot
+                            Solutioning App Architecture
                         </h1>
                         <p class="subtitle">
-                            Featuring Vue.js, AWS Lambda, and Rasberry Pi
+                            Featuring Vue.js, Ruby on Rails, Python, AWS Comprehend and Rasberry Pi
                         </p>
                     </div>
                 </div>
@@ -27,9 +27,10 @@
             >
                 <div class="content">
                     <div class="field">
-                        <label class="label" for="question">What Problem Would You Like to Solve?</label>
+                        <label class="label" for="question">Enter the problem you want to solve (technical or non-techncial) and get an answer from Enova's greatest technical minds! Featuring Enterprise Solutions Cloud Architect pumpkin, with our actual Enterprise Architect Greg Lacey and principals.</label>
                         <div class="control">
                             <textarea
+                              ref="inputControl"
                               v-model="question"
                               id="question"
                               class="textarea"
@@ -53,14 +54,19 @@
               class="section"
             >
                 <div class="content">
-                    <h2>{{ principalName }} Says</h2>
+                  <h2>You said</h2>
+                  <i>"{{ question }}"</i>
+                  <div class="sentiment-analysis">
+                    (which has a {{ sentiment }} sentiment)
+                  </div>
+                  <h2>{{ principalName }} says</h2>
                     <div class="principal">
                       <img
                         class="principal__img"
                         :src="`assets/img/${principal}.jpg`"
                         alt=""
                       >
-                      <div class="speech-bubble">{{ bubbleText }}</div>
+                      <div class="speech-bubble" :class="sentimentClass">{{ bubbleText }}</div>
                     </div>
                     <div class="field">
                         <div class="control">
@@ -84,6 +90,7 @@
                         <progress
                           class="progress is-small is-primary"
                           max="100"
+                          :class="progressBarClass"
                         >15%</progress>
                     </div>
                   </section>
@@ -99,8 +106,11 @@
               step: 1,
               loading: false,
               question: '',
-              result: '',
+              result: {},
               bubbleText: '',
+              sentiment: '',
+              sentimentClass: '',
+              progressBarClass: '',
               principals: [
                 'costi',
                 'greg',
@@ -112,6 +122,9 @@
               ],
               principal: 'greg'
             },
+            mounted() {
+              this.focusInputQuestion();
+            },
             computed: {
               formInvalid() {
                 return this.question === '';
@@ -121,6 +134,11 @@
               }
             },
             methods: {
+              focusInputQuestion() {
+                this.$nextTick(() => {
+                  this.$refs.inputControl.focus();
+                })
+              },
               randomPrincipal() {
                 return this.principals[Math.floor(Math.random() * this.principals.length)];
               },
@@ -130,11 +148,14 @@
                   question: this.question
                 }).
                   then(response => {
+                    this.sentiment = response.data.sentiment.toLowerCase();
+                    this.progressBarClass = `progress-${this.sentiment}`;
+
                     setTimeout(() => {
                       this.loading = false;
                       this.step = 2;
                       this.principal = this.randomPrincipal();
-                      this.result = response.data.message;
+                      this.result = response.data;
                       this.speak();
                     }, 7500);
                   }).
@@ -145,7 +166,9 @@
               },
               speak() {
                 let i = 0;
-                let words = this.result.split(' ');
+                let words = this.result.message.split(' ');
+                this.sentimentClass = `sentiment-${this.sentiment}`;
+
                 let timer = setInterval(() => {
                   this.bubbleText += `${words[i]} `;
                   i ++;
@@ -156,9 +179,14 @@
               },
               reset() {
                 this.question = '';
-                this.result = '';
+                this.result = {};
                 this.bubbleText = '';
+                this.sentiment = '';
+                this.sentimentClass = '';
+                this.progressBarClass = '';
                 this.step = 1;
+
+                this.focusInputQuestion();
               }
             }
           });

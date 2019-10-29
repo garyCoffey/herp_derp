@@ -25,6 +25,35 @@
   transition: height 125ms;
 }
 
+.sentiment-negative {
+  color: red;
+}
+.sentiment-positive {
+  color: green;
+}
+.sentiment-neutral {
+  color: blue;
+}
+.sentiment-mixed {
+  color: black;
+}
+
+.progress-negative {
+  background-color: red !important;
+}
+.progress-positive {
+  background-color: green !important;
+}
+.progress-neutral {
+  background-color: blue !important;
+}
+
+.sentiment-analysis {
+  font-size: 10px;
+  font-variant: small-caps;
+}
+
+
 .speech-bubble:after {
   content: '';
   position: absolute;

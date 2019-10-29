@@ -97,7 +97,7 @@ def appear_from_back(pixels, color=(255, 0, 0)):
             time.sleep(0.02)
 
 
-def color_from_sentiment(sentiment)
+def color_from_sentiment(sentiment):
     red = (0, 0, 255)
     green = (0, 255, 0)
     blue = (255, 0, 0)

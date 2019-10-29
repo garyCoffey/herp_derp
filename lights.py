@@ -108,7 +108,7 @@ def color_from_sentiment(sentiment):
         'POSITIVE': green,
         'NEUTRAL': blue,
     }.get(sentiment, random.choice(colors))
-
+    return color
 
 
 
@@ -118,15 +118,6 @@ if __name__ == "__main__":
     pixels.show()  # Make sure to call show() after changing any pixels!
 
     sentiment = sys.argv[1] or 'NEUTRAL'
-    red = (0, 0, 255)
-    green = (0, 255, 0)
-    blue = (255, 0, 0)
-
-    color = {
-        'NEGATIVE': red,
-        'POSITIVE': green,
-        'NEUTRAL': blue,
-    }.get(sentiment, blue)
 
     for i in range(PIXEL_COUNT):
         pixels.set_pixel_rgb(i, *color_from_sentiment(sentiment))

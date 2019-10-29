@@ -106,12 +106,13 @@ if __name__ == "__main__":
     green = (0, 255, 0)
     blue = (0, 0, 255)
 
+    print(sentiment)
     color = {
         'NEGATIVE': red,
         'POSITIVE': green,
         'NEUTRAL': blue,
     }.get(sentiment, blue)
-
+    print(color)
 
     for i in range(PIXEL_COUNT):
         pixels.set_pixel_rgb(i, *color)

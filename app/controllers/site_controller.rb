@@ -15,7 +15,7 @@ class SiteController < ApplicationController
     else
       sentiment = get_sentiment(params[:question])
       render json: { message: message, sentiment: sentiment, principal: 'greg' }
-      pid = spawn("python lights.py #{sentiment[:sentiment]}")
+      pid = spawn("python lights.py #{sentiment}")
       Process.detach(pid)
     end
   end

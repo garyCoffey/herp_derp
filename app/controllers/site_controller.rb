@@ -13,8 +13,10 @@ class SiteController < ApplicationController
         error: 'Please describe your project in plain english.'
       }, status: :bad_request
     else
-      system('python lights.py')
-      render json: { message: message, sentiment: sentiment(params[:question]), principal: 'greg' }
+      sentiment = get_sentiment(params[:question])
+      render json: { message: message, sentiment: sentiment, principal: 'greg' }
+      pid = spawn('python lights.py')
+      Process.detach(pid)
     end
   end
 
@@ -25,7 +27,7 @@ class SiteController < ApplicationController
     "You should build an application using #{words.to_sentence}."
   end
 
-  def sentiment(question)
+  def get_sentiment(question)
     resp = client.detect_sentiment(
       text: question,
       language_code: 'en'

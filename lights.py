@@ -102,9 +102,9 @@ if __name__ == "__main__":
     pixels.show()  # Make sure to call show() after changing any pixels!
 
     sentiment = sys.argv[1] or 'NEUTRAL'
-    red = (255, 0, 0)
+    red = (0, 0, 255)
     green = (0, 255, 0)
-    blue = (0, 0, 255)
+    blue = (255, 0, 0)
 
     print(sentiment)
     color = {

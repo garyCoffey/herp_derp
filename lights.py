@@ -1,4 +1,5 @@
 import sys
+import random
 # Simple demo of of the WS2801/SPI-like addressable RGB LED lights.
 import time
 import RPi.GPIO as GPIO
@@ -96,6 +97,21 @@ def appear_from_back(pixels, color=(255, 0, 0)):
             time.sleep(0.02)
 
 
+def color_from_sentiment(sentiment)
+    red = (0, 0, 255)
+    green = (0, 255, 0)
+    blue = (255, 0, 0)
+
+    colors = [red, green, blue]
+    color = {
+        'NEGATIVE': red,
+        'POSITIVE': green,
+        'NEUTRAL': blue,
+    }.get(sentiment, random.choice(colors))
+
+
+
+
 if __name__ == "__main__":
     # Clear all the pixels to turn them off.
     pixels.clear()
@@ -106,18 +122,21 @@ if __name__ == "__main__":
     green = (0, 255, 0)
     blue = (255, 0, 0)
 
-    print(sentiment)
     color = {
         'NEGATIVE': red,
         'POSITIVE': green,
         'NEUTRAL': blue,
     }.get(sentiment, blue)
-    print(color)
 
     for i in range(PIXEL_COUNT):
-        pixels.set_pixel_rgb(i, *color)
+        pixels.set_pixel_rgb(i, *color_from_sentiment(sentiment))
         pixels.show()
-        time.sleep(0.08)
+        time.sleep(0.05)
+
+    for i in reversed(range(PIXEL_COUNT)):
+        pixels.set_pixel_rgb(i, *color_from_sentiment(sentiment))
+        pixels.show()
+        time.sleep(0.05)
 
 
     time.sleep(5)

@@ -124,8 +124,11 @@ if __name__ == "__main__":
         pixels.show()
         time.sleep(0.05)
 
-    for i in reversed(range(PIXEL_COUNT)):
-        pixels.set_pixel_rgb(i, *color_from_sentiment(sentiment))
+    pixels.clear()
+    pixels.show()
+
+    for j in reversed(range(PIXEL_COUNT)):
+        pixels.set_pixel_rgb(j, *color_from_sentiment(sentiment))
         pixels.show()
         time.sleep(0.05)
 

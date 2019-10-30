@@ -113,18 +113,7 @@ def color_from_sentiment(sentiment):
     }.get(sentiment, random.choice(colors))
     return color
 
-
-
-if __name__ == "__main__":
-    # Clear all the pixels to turn them off.
-    pixels.clear()
-    pixels.show()  # Make sure to call show() after changing any pixels!
-
-    try:
-      sentiment = sys.argv[1].upper()
-    except:
-      sentiment = 'NEUTRAL'
-
+def regular_run(sentiment):
     for i in range(PIXEL_COUNT):
         if sentiment == 'NEGATIVE':
             if i == 0:
@@ -173,3 +162,38 @@ if __name__ == "__main__":
     time.sleep(1)
     pixels.clear()
     pixels.show()
+
+def party_run():
+    # Clear all the pixels to turn them off.
+    pixels.clear()
+    pixels.show()  # Make sure to call show() after changing any pixels!
+
+    rainbow_cycle_successive(pixels, wait=0.1)
+    rainbow_cycle(pixels, wait=0.01)
+
+    brightness_decrease(pixels)
+
+    appear_from_back(pixels)
+
+    for i in range(3):
+        blink_color(pixels, blink_times = 1, color=(255, 0, 0))
+        blink_color(pixels, blink_times = 1, color=(0, 255, 0))
+        blink_color(pixels, blink_times = 1, color=(0, 0, 255))
+
+    rainbow_colors(pixels)
+    brightness_decrease(pixels)
+
+if __name__ == "__main__":
+    # Clear all the pixels to turn them off.
+    pixels.clear()
+    pixels.show()  # Make sure to call show() after changing any pixels!
+
+    try:
+      sentiment = sys.argv[1].upper()
+    except:
+      sentiment = 'NEUTRAL'
+
+    if sentiment == 'rainbow':
+        party_run()
+    else:
+        regular_run(sentiment)

@@ -73,7 +73,8 @@
                         <bar-chart
                           :data="barChartSentiment"
                           :colors="[['#0F0', '#F00', '#00F', '#FF0']]"
-                          height="100px">
+                          height="100px"
+                          autofocs="false">
                         </bar-chart>
                       </div>
                     </div>
@@ -85,7 +86,7 @@
                         :alt="principalName"
                         :title="principalName"
                       >
-                      <div class="speech-bubble" :class="sentimentClass">{{ bubbleText }}</div>
+                      <div class="speech-bubble">{{ bubbleText }}</div>
                     </div>
                     <div class="field">
                         <div class="control">
@@ -93,6 +94,8 @@
                               @click="reset"
                               class="button is-primary"
                               autofocus="true"
+                              type="submit"
+                              ref="anotherQuestion"
                             >Ask Another Question</button>
                         </div>
                     </div>
@@ -189,6 +192,11 @@
                   this.$refs.inputControl.focus();
                 })
               },
+              focusAskAnotherQuestion() {
+                this.$nextTick(() => {
+                  this.$refs.anotherQuestion.focus();
+                })
+              },
               randomPrincipal() {
                 return this.principals[Math.floor(Math.random() * this.principals.length)];
               },
@@ -210,6 +218,7 @@
                       this.result = response.data;
                       this.speak();
                       this.setChartData(response.data.sentiment);
+                      this.focusAskAnotherQuestion();
                     }, 7500);
                   }).
                   catch(e => {

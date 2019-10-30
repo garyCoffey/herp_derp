@@ -120,23 +120,56 @@ if __name__ == "__main__":
     pixels.clear()
     pixels.show()  # Make sure to call show() after changing any pixels!
 
-    sentiment = sys.argv[1] or 'NEUTRAL'
+    try:
+      sentiment = sys.argv[1].upper()
+    except:
+      sentiment = 'NEUTRAL'
 
     for i in range(PIXEL_COUNT):
-        pixels.set_pixel_rgb(i, *color_from_sentiment(sentiment))
+        if sentiment == 'NEGATIVE':
+            if i == 0:
+                x = [64,64,255]
+            x[0] -= 2
+            x[1] -= 2
+        elif sentiment == 'POSITIVE':
+            if i == 0:
+                x = [64, 255, 64]
+            x[0] -= 2
+	    x[2] -= 2
+        elif sentiment == 'NEUTRAL':
+            if i == 0:
+                x = [255, 96, 96]
+	    x[1] -= 3
+            x[2] -= 3
+        else:
+            x = color_from_sentiment(sentiment)
+
+        pixels.set_pixel_rgb(i, *x)
         pixels.show()
         time.sleep(0.08)
 
-    time.sleep(2)
+    time.sleep(1)
     pixels.clear()
     pixels.show()
 
+
     for j in reversed(range(PIXEL_COUNT)):
-        pixels.set_pixel_rgb(j, *color_from_sentiment(sentiment))
+        if sentiment == 'NEGATIVE':
+            x[0] += 2
+	    x[1] += 2
+        elif sentiment == 'POSITIVE':
+            x[0] += 2
+	    x[2] += 2
+        elif sentiment == 'NEUTRAL':
+            x[1] += 3
+	    x[2] += 3
+        else:
+            x = color_from_sentiment(sentiment)
+        pixels.set_pixel_rgb(j, *x)
         pixels.show()
         time.sleep(0.08)
 
 
-    time.sleep(5)
+    time.sleep(1)
     pixels.clear()
     pixels.show()

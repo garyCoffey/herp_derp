@@ -13,14 +13,22 @@ class SiteController < ApplicationController
         error: 'Please describe your project in plain english.'
       }, status: :bad_request
     else
-      sentiment = get_sentiment(params[:question])
-      render json: { message: message, sentiment: sentiment, principal: 'greg' }
-      pid = spawn("python lights.py #{sentiment}")
-      Process.detach(pid)
+      sentiment_response = get_sentiment(params[:question])
+
+      # For debug purposes.
+      puts sentiment_response
+
+      render json: { message: message, sentiment: sentiment_response, principal: 'greg' }
+      start_lights(sentiment_response['type'])
     end
   end
 
   private
+
+  def start_lights(sentiment)
+    pid = spawn("python lights.py #{sentiment}")
+    Process.detach(pid)
+  end
 
   def message
     words = AppConfig.architecturey.famous_words.sample(3)
@@ -28,21 +36,35 @@ class SiteController < ApplicationController
   end
 
   def get_sentiment(question)
-    resp = client.detect_sentiment(
-      text: question,
-      language_code: 'en'
+    response = client.detect_sentiment(
+        text: question,
+        language_code: 'en'
     )
-    puts resp
-    resp.sentiment
+    {
+      type: response.sentiment.downcase,
+      scores: {
+        negative: response.sentiment_score.negative,
+        positive: response.sentiment_score.positive,
+        neutral: response.sentiment_score.neutral,
+        mixed: response.sentiment_score.mixed
+      }
+    }
   rescue Aws::Comprehend::Errors::ServiceError => e
     puts e
-
-    'NEUTRAL'
+    {
+      type: 'neutral',
+      scores: {
+        negative: 0.0,
+        positive: 0.0,
+        neutral: 0.0,
+        mixed: 0.0
+      }
+    }
   end
 
   def client
     return @client if @client
 
-    @client = Aws::Comprehend::Client.new(:profile => 'herp_derp')
+    @client = Aws::Comprehend::Client.new(profile: 'herp_derp')
   end
 end

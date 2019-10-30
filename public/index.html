@@ -2,13 +2,14 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Building the next generation Enterprise Solutions Cloud Architect</title>
+        <title>Pumpkin Office Hours</title>
         <link rel="stylesheet" href="assets/css/normalize.min.css">
         <link rel="stylesheet" href="assets/css/bulma.min.css">
         <link rel="stylesheet" href="assets/css/main.css">
     </head>
     <body translate="no">
-        <div id="app" v-cloak>
+        <div id="app" v-cloak class="flex-wrapper">
+          <div>
             <header class="hero is-primary">
                 <div class="hero-body">
                     <div class="content">
@@ -57,21 +58,35 @@
               class="section"
             >
                 <div class="content">
-                  <h2>You said</h2>
-                  <div class="user-question">
-                    "{{ question }}"
-                  </div>
-                  <div class="sentiment-analysis">
-                    (which has a {{ sentiment }} sentiment)
-                  </div>
-                  <h2>{{ principalName }} says</h2>
+                    <div class="columns">
+                      <div class="column">
+                        <h2>You said</h2>
+                        <div class="user-question">
+                          "{{ question }}"
+                        </div>
+                        <div class="sentiment-analysis">
+                          (which has a {{ sentiment }} sentiment)
+                        </div>
+                      </div>
+                      <div class="column">
+                        <h2 class="has-text-centered">AWS Comprehend / Sentiment Analysis Results</h2>
+                        <bar-chart
+                          :data="barChartSentiment"
+                          :colors="[['#0F0', '#F00', '#00F', '#FF0']]"
+                          height="100px"
+                          autofocs="false">
+                        </bar-chart>
+                      </div>
+                    </div>
+                    <h2>{{ principalName }} says</h2>
                     <div class="principal">
                       <img
                         class="principal__img"
                         :src="`assets/img/${principal}.jpg`"
-                        alt=""
+                        :alt="principalName"
+                        :title="principalName"
                       >
-                      <div class="speech-bubble" :class="sentimentClass">{{ bubbleText }}</div>
+                      <div class="speech-bubble">{{ bubbleText }}</div>
                     </div>
                     <div class="field">
                         <div class="control">
@@ -80,6 +95,7 @@
                               class="button is-primary"
                               autofocus="true"
                               type="submit"
+                              ref="anotherQuestion"
                             >Ask Another Question</button>
                         </div>
                     </div>
@@ -93,7 +109,7 @@
                 <div class="modal-card">
                   <section class="modal-card-body">
                     <div class="content">
-                        <h3>Thinking...</h3>
+                        <h3>The Great Pumpkin is mulling over your problem...</h3>
                         <progress
                           class="progress is-small is-primary"
                           max="100"
@@ -103,17 +119,29 @@
                   </section>
                 </div>
             </div>
-            <footer class="footer">
-                <div class="content has-text-centered">
-                    <p>
-                        &copy; Copyright 2019, Team Brexit <img src="assets/img/united-kingdom-flag-icon-32.png" title="Be calm, we're not leaving you a loan" alt="Be calm, we're not leaving you a loan"/>.  All rights in special-reserve.
-                    </p>
-                </div>
-            </footer>
+          </div>
+          <footer class="footer">
+              <div class="content has-text-centered is-small">
+                  <p>
+                      &copy;
+                      Copyright 2019,
+                      Team Brexit
+                      <img
+                        src="assets/img/united-kingdom-flag-icon-32.png"
+                        title="Be calm, we're not leaving you a loan"
+                        alt="Be calm, we're not leaving you a loan"/>.
+                      All rights in special-reserve.
+                  </p>
+              </div>
+          </footer>
         </div>
         <script src="assets/js/axios.min.js"></script>
         <script src="assets/js/vue.min.js"></script>
+        <script src="assets/js/Chart.bundle.js"></script>
+        <script src="assets/js/vue-chartkick.js"></script>
         <script>
+          const SENTIMENTS = ['positive', 'negative', 'neutral', 'mixed'];
+
           const app = new Vue({
             el: "#app",
             data: {
@@ -125,6 +153,7 @@
               sentiment: '',
               sentimentClass: '',
               progressBarClass: '',
+              barChartSentiment: [],
               principals: [
                 'costi',
                 'greg',
@@ -148,9 +177,24 @@
               }
             },
             methods: {
+              setChartData(sentiment) {
+                scores = sentiment['scores']
+
+                bars = [];
+                SENTIMENTS.forEach(function (type, index){
+                  bars.push([type, scores[type]]);
+                });
+
+                this.barChartSentiment = bars;
+              },
               focusInputQuestion() {
                 this.$nextTick(() => {
                   this.$refs.inputControl.focus();
+                })
+              },
+              focusAskAnotherQuestion() {
+                this.$nextTick(() => {
+                  this.$refs.anotherQuestion.focus();
                 })
               },
               randomPrincipal() {
@@ -162,7 +206,9 @@
                   question: this.question
                 }).
                   then(response => {
-                    this.sentiment = response.data.sentiment.toLowerCase();
+                    this.sentiment = response.data.sentiment.type;
+
+                    // Set this now so the progress bar changes immediately.
                     this.progressBarClass = `progress-${this.sentiment}`;
 
                     setTimeout(() => {
@@ -171,6 +217,8 @@
                       this.principal = this.randomPrincipal();
                       this.result = response.data;
                       this.speak();
+                      this.setChartData(response.data.sentiment);
+                      this.focusAskAnotherQuestion();
                     }, 7500);
                   }).
                   catch(e => {
@@ -198,6 +246,7 @@
                 this.sentiment = '';
                 this.sentimentClass = '';
                 this.progressBarClass = '';
+                this.barChartSentiment = [];
                 this.step = 1;
 
                 this.focusInputQuestion();

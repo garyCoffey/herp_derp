@@ -1,23 +1,21 @@
-import sys
-import random
 # Simple demo of of the WS2801/SPI-like addressable RGB LED lights.
 import time
 import RPi.GPIO as GPIO
-
+ 
 # Import the WS2801 module.
 import Adafruit_WS2801
 import Adafruit_GPIO.SPI as SPI
-
-
+ 
+ 
 # Configure the count of pixels:
 PIXEL_COUNT = 32
-
+ 
 # Alternatively specify a hardware SPI connection on /dev/spidev0.0:
 SPI_PORT   = 0
 SPI_DEVICE = 0
 pixels = Adafruit_WS2801.WS2801Pixels(PIXEL_COUNT, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE), gpio=GPIO)
-
-
+ 
+ 
 # Define the wheel function to interpolate between different hues.
 def wheel(pos):
     if pos < 85:
@@ -28,7 +26,7 @@ def wheel(pos):
     else:
         pos -= 170
         return Adafruit_WS2801.RGB_to_color(0, pos * 3, 255 - pos * 3)
-
+ 
 # Define rainbow cycle function to do a cycle of all hues.
 def rainbow_cycle_successive(pixels, wait=0.1):
     for i in range(pixels.count()):
@@ -40,7 +38,7 @@ def rainbow_cycle_successive(pixels, wait=0.1):
         pixels.show()
         if wait > 0:
             time.sleep(wait)
-
+ 
 def rainbow_cycle(pixels, wait=0.005):
     for j in range(256): # one cycle of all 256 colors in the wheel
         for i in range(pixels.count()):
@@ -48,7 +46,7 @@ def rainbow_cycle(pixels, wait=0.005):
         pixels.show()
         if wait > 0:
             time.sleep(wait)
-
+ 
 def rainbow_colors(pixels, wait=0.05):
     for j in range(256): # one cycle of all 256 colors in the wheel
         for i in range(pixels.count()):
@@ -56,7 +54,7 @@ def rainbow_colors(pixels, wait=0.05):
         pixels.show()
         if wait > 0:
             time.sleep(wait)
-
+ 
 def brightness_decrease(pixels, wait=0.01, step=1):
     for j in range(int(256 // step)):
         for i in range(pixels.count()):
@@ -68,7 +66,7 @@ def brightness_decrease(pixels, wait=0.01, step=1):
         pixels.show()
         if wait > 0:
             time.sleep(wait)
-
+ 
 def blink_color(pixels, blink_times=5, wait=0.5, color=(255,0,0)):
     for i in range(blink_times):
         # blink two times, then wait
@@ -82,7 +80,7 @@ def blink_color(pixels, blink_times=5, wait=0.5, color=(255,0,0)):
             pixels.show()
             time.sleep(0.08)
         time.sleep(wait)
-
+ 
 def appear_from_back(pixels, color=(255, 0, 0)):
     pos = 0
     for i in range(pixels.count()):
@@ -95,48 +93,29 @@ def appear_from_back(pixels, color=(255, 0, 0)):
             pixels.set_pixel(j, Adafruit_WS2801.RGB_to_color( color[0], color[1], color[2] ))
             pixels.show()
             time.sleep(0.02)
-
-
-def color_from_sentiment(sentiment):
-    x = [0] * 190
-    x = [i for i in xrange(190)]
-    x = random.choice(x)
-    red = (x , 0, 255)
-    green = (0, 255, x)
-    blue = (255, x, x)
-
-    colors = [red, green, blue]
-    color = {
-        'NEGATIVE': red,
-        'POSITIVE': green,
-        'NEUTRAL': blue,
-    }.get(sentiment, random.choice(colors))
-    return color
-
-
-
+            
+ 
 if __name__ == "__main__":
     # Clear all the pixels to turn them off.
     pixels.clear()
     pixels.show()  # Make sure to call show() after changing any pixels!
-
-    sentiment = sys.argv[1] or 'NEUTRAL'
-
-    for i in range(PIXEL_COUNT):
-        pixels.set_pixel_rgb(i, *color_from_sentiment(sentiment))
-        pixels.show()
-        time.sleep(0.08)
-
-    time.sleep(2)
-    pixels.clear()
-    pixels.show()
-
-    for j in reversed(range(PIXEL_COUNT)):
-        pixels.set_pixel_rgb(j, *color_from_sentiment(sentiment))
-        pixels.show()
-        time.sleep(0.08)
-
-
-    time.sleep(5)
-    pixels.clear()
-    pixels.show()
+ 
+    rainbow_cycle_successive(pixels, wait=0.1)
+    rainbow_cycle(pixels, wait=0.01)
+ 
+    brightness_decrease(pixels)
+    
+    appear_from_back(pixels)
+    
+    for i in range(3):
+        blink_color(pixels, blink_times = 1, color=(255, 0, 0))
+        blink_color(pixels, blink_times = 1, color=(0, 255, 0))
+        blink_color(pixels, blink_times = 1, color=(0, 0, 255))
+ 
+    
+    
+    rainbow_colors(pixels)
+    
+    brightness_decrease(pixels)
+    
+ 

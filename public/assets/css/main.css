@@ -45,16 +45,16 @@
   color: #FF0;
 }
 
-.progress-negative {
+.progress.negative {
   background-color: red !important;
 }
-.progress-positive {
+.progress.positive {
   background-color: green !important;
 }
-.progress-neutral {
+.progress.neutral {
   background-color: blue !important;
 }
-.progress-mixed {
+.progress.mixed {
   background-color: #FF0 !important;
 }
 

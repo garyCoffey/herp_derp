@@ -19,7 +19,7 @@ class SiteController < ApplicationController
       puts sentiment_response
 
       render json: { message: message, sentiment: sentiment_response, principal: 'greg' }
-      start_lights(sentiment_response['type'])
+      start_lights(sentiment_response[:type])
     end
   end
 

@@ -178,14 +178,9 @@
             },
             methods: {
               setChartData(sentiment) {
-                scores = sentiment['scores']
+                data = SENTIMENTS.map( type => [this.toCapitalized(type), sentiment['scores'][type]] )
 
-                bars = [];
-                SENTIMENTS.forEach(function (type, index){
-                  bars.push([type, scores[type]]);
-                });
-
-                this.barChartSentiment = bars;
+                this.barChartSentiment = data;
               },
               focusInputQuestion() {
                 this.$nextTick(() => {
@@ -196,6 +191,9 @@
                 this.$nextTick(() => {
                   this.$refs.anotherQuestion.focus();
                 })
+              },
+              toCapitalized(text) {
+                return text.charAt(0).toUpperCase() + text.slice(1);
               },
               randomPrincipal() {
                 return this.principals[Math.floor(Math.random() * this.principals.length)];
@@ -209,7 +207,7 @@
                     this.sentiment = response.data.sentiment.type;
 
                     // Set this now so the progress bar changes immediately.
-                    this.progressBarClass = `progress-${this.sentiment}`;
+                    this.progressBarClass = this.sentiment;
 
                     setTimeout(() => {
                       this.loading = false;

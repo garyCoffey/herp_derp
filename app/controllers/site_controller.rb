@@ -12,12 +12,13 @@ class SiteController < ApplicationController
       render json: {
         error: 'Please describe your project in plain english.'
       }, status: :bad_request
+    elsif 'easter egg'.include?(params[:question])
+      render json: { message: 'You have unlocked a secret level', sentiment: 'PARTY', principal: 'uk' }
+      start_lights('rainbow')
     else
       sentiment_response = get_sentiment(params[:question])
-
       # For debug purposes.
       puts sentiment_response
-
       render json: { message: message, sentiment: sentiment_response, principal: 'greg' }
       start_lights(sentiment_response[:type])
     end

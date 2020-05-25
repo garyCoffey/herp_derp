@@ -127,7 +127,7 @@
                       Copyright 2019,
                       Team Brexit
                       <img
-                        src="assets/img/united-kingdom-flag-icon-32.png"
+                        src="assets/img/uk.png"
                         title="Be calm, we're not leaving you a loan"
                         alt="Be calm, we're not leaving you a loan"/>.
                       All rights in special-reserve.
@@ -154,6 +154,7 @@
               sentimentClass: '',
               progressBarClass: '',
               barChartSentiment: [],
+              uk: 'uk2',
               principals: [
                 'costi',
                 'greg',
@@ -161,7 +162,7 @@
                 'rob',
                 'sam',
                 'vishak',
-                'sri',  
+                'sri',
                 'vishal'
               ],
               principal: 'greg'
@@ -198,8 +199,12 @@
                   this.$refs.anotherQuestion.focus();
                 })
               },
-              randomPrincipal() {
-                return this.principals[Math.floor(Math.random() * this.principals.length)];
+              randomPrincipal(response) {
+                if (response.data.principal === 'uk'){
+                  return this.uk;
+                }else{
+                  return this.principals[Math.floor(Math.random() * this.principals.length)];
+                }
               },
               submit(response) {
                 this.loading = true;
@@ -215,7 +220,7 @@
                     setTimeout(() => {
                       this.loading = false;
                       this.step = 2;
-                      this.principal = this.randomPrincipal();
+                      this.principal = this.randomPrincipal(response);
                       this.result = response.data;
                       this.speak();
                       this.setChartData(response.data.sentiment);
